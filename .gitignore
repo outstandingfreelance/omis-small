@@ -1,0 +1,3 @@
+# Cursor IDE local configuration files (should never be committed)
+.cursor/
+.cursorrules
