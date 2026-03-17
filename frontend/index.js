@@ -5,12 +5,39 @@ const modalBody = modal.querySelector('.modal-body')
 const modalTitle = modal.querySelector('#exampleModalLabel')
 const modalBtn = modal.querySelector('#btn-save-changes')
 
+const btnsDelete = bookList.querySelectorAll('.delete')
+const btnsEdit = bookList.querySelectorAll('.edit')
+//так мы повесим прослушиватель сразу на все кнопки
+
 function renderBooks(books) {
     books.forEach(
         book => {
             const li = document.createElement('li')
             li.textContent = book.title
             li.classList.add('list-group-item')
+
+            const btnDelete = document.createElement('button')
+            btnDelete.innerHTML = '<i class="bi bi-trash3"></i>'
+            btnDelete.classList.add('btn', 'btn-danger', 'btn-sm', 'float-end', 'delete')
+
+            btnDelete.setAttribute('data-id', book.id)
+
+            const btnEdit = document.createElement('button')
+            btnEdit.innerHTML = '<i class="bi bi-pencil-square"></i>'
+            btnEdit.classList.add('btn', 'btn-primary', 'btn-sm', 'float-end', 'me-2', 'edit')
+
+            btnEdit.setAttribute('data-id', book.id)
+
+            btnEdit.addEventListener('click', event => {
+                console.log(event)
+                console.log("кликнули на кнопку редактировать")
+            })
+            btnDelete.addEventListener('click', forBtnDelete)
+
+
+            li.innerHTML = li.textContent + btnDelete.outerHTML + btnEdit.outerHTML
+
+            
             bookList.appendChild(li)
         }
     )
@@ -41,9 +68,6 @@ modal.addEventListener('show.bs.modal', event => {
 
 
 modalBtn.addEventListener('click', event => {
-    modalBody.querySelector('#exampleFormControlInput1').value = "alskdfj"
-    modalBody.querySelector('#exampleFormControlInput2').value = "alskdfj"
-
     const title = modalBody.querySelector('#exampleFormControlInput1').value
     const author = modalBody.querySelector('#exampleFormControlInput2').value
 
@@ -68,7 +92,7 @@ modalBtn.addEventListener('click', event => {
         .then(data => {
             getBooks()
             console.log(data);
-            console.log(data.body);
+            console.log("body:", data.body);
             console.log("newBook:", data.newBook);
             console.log("result:", data.result);
     })
@@ -79,3 +103,14 @@ modalBtn.addEventListener('click', event => {
 // сперва фетч - посылаем запрос
 // первый then - получаем ответ
 // второй then - чё-то делаем с этим ответом
+
+
+function forBtnDelete(event) {
+     console.log(event)
+     console.log("кликнули на кнопку удалить")
+}
+
+function forBtnEdit(event) {
+     console.log(event)
+     console.log("кликнули на кнопку редактировать")
+}
