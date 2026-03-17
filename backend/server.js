@@ -42,8 +42,8 @@ app.post('/test', (req, res) => res.status(200).send({result: 'ok'}));
 app.post('/books/add', (req, res) => {
     const { title, author } = req.body;
     console.log(req);
-    /*
-    const newBook = null;
+    
+    let newBook = null;
     try {
         if (!title || !author) {
             //throw new Error('Title and author are required');
@@ -68,12 +68,12 @@ app.post('/books/add', (req, res) => {
     } finally {
         // anyway run this code , even if there was an error
     }
-        */
+    
 
     res.status(200).send({
         result: 'ok',
         message: 'Book added successfully',
-        //newBook: newBook//отсылаем чтобы наш фронтендер увидел в браузере во вкладке "сеть"
+        newBook: newBook//отсылаем чтобы наш фронтендер увидел в браузере во вкладке "сеть"
     });
 });
 

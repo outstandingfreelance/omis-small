@@ -5,6 +5,17 @@ const modalBody = modal.querySelector('.modal-body')
 const modalTitle = modal.querySelector('#exampleModalLabel')
 const modalBtn = modal.querySelector('#btn-save-changes')
 
+function renderBooks(books) {
+    books.forEach(
+        book => {
+            const li = document.createElement('li')
+            li.textContent = book.title
+            li.classList.add('list-group-item')
+            bookList.appendChild(li)
+        }
+    )
+}
+
 function getBooks() {
     fetch('http://localhost:3000/books')
         // если header 200, то...
@@ -23,24 +34,15 @@ function getForm() {
         })
 }
 
-
-function renderBooks(books) {
-    books.forEach(
-        book => {
-            const li = document.createElement('li')
-            li.textContent = book.title
-            li.classList.add('list-group-item')
-            bookList.appendChild(li)
-        }
-    )
-}
-
 modal.addEventListener('show.bs.modal', event => {
     getForm()
     modalTitle.textContent = 'Добавить книгу'
 })
 
+
 modalBtn.addEventListener('click', event => {
+    modalBody.querySelector('#exampleFormControlInput1').value = "alskdfj"
+    modalBody.querySelector('#exampleFormControlInput2').value = "alskdfj"
 
     const title = modalBody.querySelector('#exampleFormControlInput1').value
     const author = modalBody.querySelector('#exampleFormControlInput2').value
@@ -49,8 +51,6 @@ modalBtn.addEventListener('click', event => {
         title: title,
         author: author
     }
-
-    console.log(book.title);
 
     fetch('http://localhost:3000/books/add', {
         method: 'POST',
@@ -66,9 +66,13 @@ modalBtn.addEventListener('click', event => {
             return response.json()
         })
         .then(data => {
-            console.log(data);
             getBooks()
+            console.log(data);
+            console.log(data.body);
+            console.log("newBook:", data.newBook);
+            console.log("result:", data.result);
     })
+    
 })
 
 
