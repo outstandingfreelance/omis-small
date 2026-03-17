@@ -28,14 +28,14 @@ function renderBooks(books) {
 
             btnEdit.setAttribute('data-id', book.id)
 
-            btnEdit.addEventListener('click', event => {
-                console.log(event)
-                console.log("кликнули на кнопку редактировать")
-            })
+            btnEdit.addEventListener('click', forBtnEdit)
             btnDelete.addEventListener('click', forBtnDelete)
 
 
-            li.innerHTML = li.textContent + btnDelete.outerHTML + btnEdit.outerHTML
+            //li.innerHTML = li.textContent + btnDelete.outerHTML + btnEdit.outerHTML
+                
+            li.appendChild(btnEdit)
+            li.appendChild(btnDelete)
 
             
             bookList.appendChild(li)
@@ -106,8 +106,20 @@ modalBtn.addEventListener('click', event => {
 
 
 function forBtnDelete(event) {
-     console.log(event)
+     console.log(event.target.dataset.id)
      console.log("кликнули на кнопку удалить")
+     fetch('http://localhost:3000/books/delete', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id: event.target.dataset.id})
+    }).then(response => {
+        return response.json()
+    }).then(data => {
+        //TODO - удалить книгу из списка на странице
+        console.log(data)
+    })
 }
 
 function forBtnEdit(event) {
