@@ -12,6 +12,7 @@ const btnsEdit = bookList.querySelectorAll('.edit')
 function renderBooks(books) {
     books.forEach(
         book => {
+            bookList.innerHTML = ''
             const li = document.createElement('li')
             li.textContent = book.title
             li.classList.add('list-group-item')
