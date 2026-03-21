@@ -144,8 +144,5 @@ function forBtnEdit(event) {
 
 function fieldToTakeValue() {
     exampleFormControlInput1.addEventListener()
-
-    ]]]|\]
-    =[-09465
 }
 
