@@ -128,7 +128,7 @@ function forBtnEdit(event) {
     console.log(event.target.dataset.id)
     const idFromEventTarget = event.target.dataset.id;
     console.log("кликнули на кнопку редактировать")
-    fetch('http://localhost:5500/books/' + idFromEventTarget, {
+    fetch('http://localhost:3000/books/' + 2, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

@@ -97,6 +97,7 @@ app.delete('/books/delete', (req, res) => {
 
 // books/123 -> id = 123 (req.params)
 app.get('/books/:id', (req, customResponse) => {
+    
     const ourId = req.params.id;
     
     const bookItem = books.filter(book => book.id === ourId);
@@ -114,5 +115,5 @@ app.get('/books/:id', (req, customResponse) => {
 
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`SERVER IS RUNNING ON PORT ${port}`);
 });
