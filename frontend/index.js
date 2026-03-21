@@ -28,16 +28,16 @@ function renderBooks(books) {
 
             btnEdit.setAttribute('data-id', book.id)
 
-            btnEdit.addEventListener('click', forBtnEdit)
+            btnEdit.add.EventListener('click', forBtnEdit)
             btnDelete.addEventListener('click', forBtnDelete)
 
 
             //li.innerHTML = li.textContent + btnDelete.outerHTML + btnEdit.outerHTML
-                
+
             li.appendChild(btnEdit)
             li.appendChild(btnDelete)
 
-            
+
             bookList.appendChild(li)
         }
     )
@@ -83,7 +83,7 @@ modalBtn.addEventListener('click', event => {
         },
         body: JSON.stringify(book)
     })
-    .then(response => {
+        .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -95,8 +95,8 @@ modalBtn.addEventListener('click', event => {
             console.log("body:", data.body);
             console.log("newBook:", data.newBook);
             console.log("result:", data.result);
-    })
-    
+        })
+
 })
 
 
@@ -106,23 +106,46 @@ modalBtn.addEventListener('click', event => {
 
 
 function forBtnDelete(event) {
-     console.log(event.target.dataset.id)
-     console.log("кликнули на кнопку удалить")
-     fetch('http://localhost:3000/books/delete', {
+    console.log(event.target.dataset.id)
+    console.log("кликнули на кнопку удалить")
+    fetch('http://localhost:3000/books/delete', {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({id: event.target.dataset.id})
+        body: JSON.stringify({ id: event.target.dataset.id })
     }).then(response => {
         return response.json()
     }).then(data => {
         //TODO - удалить книгу из списка на странице
         console.log(data)
+        getBooks()
     })
 }
 
 function forBtnEdit(event) {
-     console.log(event)
-     console.log("кликнули на кнопку редактировать")
+    console.log(event)
+    console.log("кликнули на кнопку редактировать")
+    fetch('http://localhost:3000/books/delete', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: event.target.dataset.id })
+    }
+        .then(response => {
+            return response.json()
+        }).then(data => {
+            console.log(data);
+            getBooks()
+        })
+    )
 }
+
+function fieldToTakeValue() {
+    exampleFormControlInput1.addEventListener()
+
+    ]]]|\]
+    =[-09465
+}
+
