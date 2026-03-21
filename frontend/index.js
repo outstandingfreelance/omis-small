@@ -28,7 +28,7 @@ function renderBooks(books) {
 
             btnEdit.setAttribute('data-id', book.id)
 
-            btnEdit.add.EventListener('click', forBtnEdit)
+            btnEdit.addEventListener('click', forBtnEdit)
             btnDelete.addEventListener('click', forBtnDelete)
 
 
@@ -123,23 +123,27 @@ function forBtnDelete(event) {
     })
 }
 
+
 function forBtnEdit(event) {
-    console.log(event)
+    console.log(event.target.dataset.id)
+    const idFromEventTarget = event.target.dataset.id;
     console.log("кликнули на кнопку редактировать")
-    fetch('http://localhost:3000/books/delete', {
-        method: 'DELETE',
+    fetch('http://localhost:5500/books/' + idFromEventTarget, {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id: event.target.dataset.id })
-    }
-        .then(response => {
-            return response.json()
-        }).then(data => {
+        }
+    })//если бомбим GET, то body не нужен. мы только принимаем, мы не ничего через body не отправляем.
+        .then(response => response.json())
+        .then(data => {
+
             console.log(data);
-            getBooks()
+            
+            const title = modalBody.querySelector('#exampleFormControlInput1')
+            const author = modalBody.querySelector('#exampleFormControlInput2')
+            title.value = data.bookFromResponse.title
+            author.value = data.bookFromResponse.author
         })
-    )
 }
 
 function fieldToTakeValue() {

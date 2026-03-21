@@ -79,7 +79,39 @@ app.post('/books/add', (req, res) => {
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
+    
 });
+
+app.delete('/books/delete', (req, res) => {
+    const { id } = req.body; //в реальной жизни мы бы получили id из req.body, но для теста я просто захардкодил его
+    //const id = red.body.id;
+    const index = books.findIndex(book => book.id === id);
+    books.splice(index, 1)
+   
+    console.log(books);
+    res.status(200).send({
+        result: 'ok',
+        message: 'Book deleted successfully',
+    })
+})
+
+// books/123 -> id = 123 (req.params)
+app.get('/books/:id', (req, customResponse) => {
+    const ourId = req.params.id;
+    
+    const bookItem = books.filter(book => book.id === ourId);
+
+
+    // get умеет брать знаечение из url и соотносить его с ключом массива или типа того. но он не использует body для запросов
+    
+    console.log(bookItem);
+    customResponse.status(200).send({
+        result: 'ok',
+        message: 'Book deleted successfully',
+        bookFromResponse: bookItem
+    })
+})
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
