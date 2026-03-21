@@ -10,9 +10,10 @@ const btnsEdit = bookList.querySelectorAll('.edit')
 //так мы повесим прослушиватель сразу на все кнопки
 
 function renderBooks(books) {
+    console.log(books)
+    bookList.innerHTML = ''
     books.forEach(
         book => {
-            bookList.innerHTML = ''
             const li = document.createElement('li')
             li.textContent = book.title
             li.classList.add('list-group-item')
@@ -107,7 +108,7 @@ modalBtn.addEventListener('click', event => {
 
 
 function forBtnDelete(event) {
-    console.log(event.target.dataset.id)
+    console.log(event.currentTarget.dataset.id)
     console.log("кликнули на кнопку удалить")
     fetch('http://localhost:3000/books/delete', {
         method: 'DELETE',
@@ -126,10 +127,10 @@ function forBtnDelete(event) {
 
 
 function forBtnEdit(event) {
-    console.log(event.target.dataset.id)
-    const idFromEventTarget = event.target.dataset.id;
+    console.log(event.currentTarget.dataset.id)
+    const idFromEventTarget = event.currentTarget.dataset.id;
     console.log("кликнули на кнопку редактировать")
-    fetch('http://localhost:3000/books/' + 2, {
+    fetch('http://localhost:3000/books/' + idFromEventTarget, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -139,7 +140,7 @@ function forBtnEdit(event) {
         .then(data => {
 
             console.log(data);
-            
+
             const title = modalBody.querySelector('#exampleFormControlInput1')
             const author = modalBody.querySelector('#exampleFormControlInput2')
             title.value = data.bookFromResponse.title

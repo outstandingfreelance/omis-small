@@ -11,7 +11,7 @@ app.use(express.json());
 const books = [
     {
         id: 1,
-        title: 'Book 1',
+        title: 'Book 1;kjmnlkjhokj,hnoilukklkjn',
         author: 'Author 1'
     },
     {
@@ -30,19 +30,19 @@ app.get('/books', (req, res) => {
     //app.get - родная функция экспресса
     // если он увидит, что прилетел запрос get, то он запустит именно
     // эту функцию
-
+    console.log(books)
     // первый параметр - это то, на запрос с какой директории надо реагировать
-  res.send(books);
+    res.send(books);
 });
 
-app.post('/test', (req, res) => res.status(200).send({result: 'ok'}));
+app.post('/test', (req, res) => res.status(200).send({ result: 'ok' }));
 
 
 // по пост - он сам назодит в документе, какой запрос имеет тип пост
 app.post('/books/add', (req, res) => {
     const { title, author } = req.body;
     console.log(req);
-    
+
     let newBook = null;
     try {
         if (!title || !author) {
@@ -61,14 +61,14 @@ app.post('/books/add', (req, res) => {
     } catch (err) {
         res
             .status(500)
-            .send({ 
+            .send({
                 result: 'error',
-                message: err.message 
+                message: err.message
             });
     } finally {
         // anyway run this code , even if there was an error
     }
-    
+
 
     res.status(200).send({
         result: 'ok',
@@ -79,7 +79,7 @@ app.post('/books/add', (req, res) => {
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
-    
+
 });
 
 app.delete('/books/delete', (req, res) => {
@@ -87,7 +87,7 @@ app.delete('/books/delete', (req, res) => {
     //const id = red.body.id;
     const index = books.findIndex(book => book.id === id);
     books.splice(index, 1)
-   
+
     console.log(books);
     res.status(200).send({
         result: 'ok',
@@ -97,16 +97,20 @@ app.delete('/books/delete', (req, res) => {
 
 // books/123 -> id = 123 (req.params)
 app.get('/books/:id', (req, customResponse) => {
-    
     const ourId = req.params.id;
-    
-    const bookItem = books.filter(book => book.id === ourId);
+
+    const bookItem = books.find(book => {
+        console.log(ourId, "book id")
+        return book.id === ourId;
+    }
+    )
+    console.log(bookItem, ourId);
 
 
     // get умеет брать знаечение из url и соотносить его с ключом массива или типа того. но он не использует body для запросов
-    
-    console.log(bookItem);
+
     customResponse.status(200).send({
+        idFromRequest: ourId,
         result: 'ok',
         message: 'Book deleted successfully',
         bookFromResponse: bookItem
@@ -115,5 +119,5 @@ app.get('/books/:id', (req, customResponse) => {
 
 
 app.listen(port, () => {
-  console.log(`SERVER IS RUNNING ON PORT ${port}`);
+    console.log(`SERVER IS RUNNING ON PORT ${port}`);
 });
