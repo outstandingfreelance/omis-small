@@ -88,6 +88,8 @@ app.delete('/books/delete', (req, res) => {
     const index = books.findIndex(book => book.id === id);
     books.splice(index, 1)
 
+    console.log('Deleted ', id);
+    
     console.log(books);
     res.status(200).send({
         result: 'ok',
@@ -100,20 +102,21 @@ app.get('/books/:id', (req, customResponse) => {
     const ourId = req.params.id;
 
     const bookItem = books.find(book => {
-        console.log(ourId, "book id")
-        return book.id === ourId;
+        //console.log(ourId,  "book id", book.id)
+        return parseInt(book.id) === parseInt(ourId);
     }
     )
-    console.log(bookItem, ourId);
+    console.log('book', bookItem);
 
 
     // get умеет брать знаечение из url и соотносить его с ключом массива или типа того. но он не использует body для запросов
 
     customResponse.status(200).send({
         idFromRequest: ourId,
+        bookFromResponse: bookItem,
         result: 'ok',
-        message: 'Book deleted successfully',
-        bookFromResponse: bookItem
+        message: 'Book found successfully',
+        
     })
 })
 
