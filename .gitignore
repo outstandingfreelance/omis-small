@@ -1,5 +1,6 @@
 # Cursor IDE local configuration files (should never be committed)
 .cursor/
 .cursorrules
-node_modules/
+node_modules
 конспект.md
+backend/node_modules
