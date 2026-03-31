@@ -1,206 +1,129 @@
 const bookList = document.getElementById('book-list')
+const modal = document.getElementById('exampleModal')
+const modalTitle = modal.querySelector('#exampleModalLabel')
+const modalBody = modal.querySelector('.modal-body')
+const modalBtn = modal.querySelector('#btn-save-changes')
 
-const modalNew = document.getElementById('exampleModal')
-const modalTitle = modalNew.querySelector('#exampleModalLabel')
-const modalBtn = modalNew.querySelector('#btn-save-changes')
+const deletePrompt = document.getElementById('deletePrompt')
+const bsModal = new bootstrap.Modal(modal)
+const bsDeleteModal = new bootstrap.Modal(deletePrompt)
 
-const modalEdit = document.getElementById('exampleModal')
+let currentEditId = null
 
-const modalDeletePrompt = document.getElementById('deletePrompt')
-const modalDeleteBody = modalDeletePrompt.querySelector('.modal-body')
-
-const btnsDelete = bookList.querySelectorAll('.delete')
-const btnsEdit = bookList.querySelectorAll('.edit')
-//так мы повесим прослушиватель сразу на все кнопки
-
-const btnNewBook = document.getElementById('btn-add-new')
-btnNewBook.onclick = async () => {
-    const form = await getForm()
-    modalNew.addEventListener('show.bs.modal', event => {
-        
-        modalNew.querySelector('.modal-body').innerHTML = form
-        modalTitle.textContent = 'Добавить книгу'
-    })
-    new bootstrap.Modal(modalNew).show()
-}
-
-
-
-function renderBooks(books) {
-    console.log(books)
-    bookList.innerHTML = ''
-    books.forEach(
-        book => {
-            const li = document.createElement('li')
-            li.textContent = book.title
-            li.classList.add('list-group-item')
-
-            const btnDelete = document.createElement('button')
-            btnDelete.innerHTML = '<i class="bi bi-trash3"></i>'
-            btnDelete.classList.add('btn', 'btn-danger', 'btn-sm', 'float-end', 'm-1', 'delete')
-
-            btnDelete.setAttribute('data-id', book.id)
-
-            const btnEdit = document.createElement('button')
-            btnEdit.innerHTML = '<i class="bi bi-pencil-square"></i>'
-            btnEdit.classList.add('btn', 'btn-primary', 'btn-sm', 'float-end', 'm-1', 'edit')
-
-            btnEdit.setAttribute('data-id', book.id)
-
-            btnEdit.addEventListener('click', forBtnEdit)
-            btnDelete.addEventListener('click', forBtnDelete)
-
-
-            //li.innerHTML = li.textContent + btnDelete.outerHTML + btnEdit.outerHTML
-
-            li.appendChild(btnEdit)
-            li.appendChild(btnDelete)
-
-
-            bookList.appendChild(li)
-        }
-    )
-}
+// ─── Fetch helpers ───────────────────────────────────────────────────────────
 
 function getBooks() {
     fetch('http://localhost:3000/books')
-        // если header 200, то...
-        .then(response => response.json()) //если ввести .text(), то он обработает ответ строкой
-        // ...то выводим данные в консоль
-        .then(data => renderBooks(data)); //data - это собственно ответ сервера
+        .then(r => r.json())
+        .then(renderBooks)
 }
-
-getBooks()
 
 async function getForm() {
-    const promis = await fetch('./book-form.html')
-    const text = await promis.text()
-    return text //промис - это объект, который может находиться в одном из трёх состояний: ожидание, исполнено, отклонено. Когда мы делаем fetch, он возвращает промис, который будет исполнен, когда данные будут получены. Метод .text() также возвращает промис, который будет исполнен, когда текст будет извлечён из ответа. Поэтому мы используем await для обоих промисов, чтобы получить результат их исполнения.
-    /*await fetch('./book-form.html')
-        .then(response => response.text())
-        .then(html => {
-    
-            modalNew.querySelector('.modal-body').innerHTML = html
-        }) */
+    const res = await fetch('./book-form.html')
+    return res.text()
 }
 
-modalBtn.addEventListener('click', event => {
-    const title = modal.querySelector('.modal-body').querySelector('#exampleFormControlInput1').value
-    const author = modal.querySelector('.modal-body').querySelector('#exampleFormControlInput2').value
+// ─── Render ──────────────────────────────────────────────────────────────────
 
-    const book = {
-        title: title,
-        author: author
-    }
+function renderBooks(books) {
+    bookList.innerHTML = ''
+    books.forEach(book => {
+        const li = document.createElement('li')
+        li.classList.add('list-group-item')
+        li.textContent = book.title
 
-    fetch('http://localhost:3000/books/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' //говорим серверу, что данные отправляем в виде json. Если не указать, сервер выдаст ошибку
-            },
-            body: JSON.stringify(book)
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json()
-        })
-        .then(data => {
-            getBooks()
-            console.log(data);
-            console.log("body:", data.body);
-            console.log("newBook:", data.newBook);
-            console.log("result:", data.result);
-        })
+        const btnEdit = document.createElement('button')
+        btnEdit.innerHTML = '<i class="bi bi-pencil-square"></i>'
+        btnEdit.classList.add('btn', 'btn-primary', 'btn-sm', 'float-end', 'm-1')
+        btnEdit.addEventListener('click', () => openEditModal(book.id))
 
+        const btnDelete = document.createElement('button')
+        btnDelete.innerHTML = '<i class="bi bi-trash3"></i>'
+        btnDelete.classList.add('btn', 'btn-danger', 'btn-sm', 'float-end', 'm-1')
+        btnDelete.addEventListener('click', () => openDeleteModal(book.id))
+
+        li.appendChild(btnEdit)
+        li.appendChild(btnDelete)
+        bookList.appendChild(li)
+    })
+}
+
+// ─── Add new book ─────────────────────────────────────────────────────────────
+
+document.getElementById('btn-add-new').addEventListener('click', async () => {
+    currentEditId = null
+    modalTitle.textContent = 'Добавить книгу'
+    modalBody.innerHTML = await getForm()
+    bsModal.show()
 })
 
+// ─── Save (add or edit) ───────────────────────────────────────────────────────
 
-// сперва фетч - посылаем запрос
-// первый then - получаем ответ
-// второй then - чё-то делаем с этим ответом
+modalBtn.addEventListener('click', () => {
+    const title = modalBody.querySelector('#exampleFormControlInput1').value
+    const author = modalBody.querySelector('#exampleFormControlInput2').value
 
+    if (currentEditId) {
+        // Edit existing book
+        fetch(`http://localhost:3000/books/edit/${currentEditId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, author })
+        })
+        .then(r => r.json())
+        .then(() => { getBooks(); bsModal.hide() })
+    } else {
+        // Add new book
+        fetch('http://localhost:3000/books/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, author })
+        })
+        .then(r => r.json())
+        .then(() => { getBooks(); bsModal.hide() })
+    }
+})
 
-function forBtnDelete(event) {
+// ─── Edit ─────────────────────────────────────────────────────────────────────
 
-    const modalDeleteTitle = modalDeletePrompt.querySelector('#deletePromptLabel')
-    modalDeleteTitle.innerText = 'Book deletion #' + event.currentTarget.dataset.id
+async function openEditModal(id) {
+    currentEditId = id
+    modalTitle.textContent = 'Редактировать книгу #' + id
+    modalBody.innerHTML = await getForm()
 
-    const _deleteConfirmed = new bootstrap.Modal(modalDeletePrompt)
-    _deleteConfirmed.show()
+    fetch(`http://localhost:3000/books/${id}`)
+        .then(r => r.json())
+        .then(data => {
+            modalBody.querySelector('#exampleFormControlInput1').value = data.bookFromResponse.title
+            modalBody.querySelector('#exampleFormControlInput2').value = data.bookFromResponse.author
+        })
 
-    modalDeletePrompt.querySelector('#btn-delete').addEventListener('click', (event) => {
+    bsModal.show()
+}
 
-        console.log(event.currentTarget.dataset.id)
-        console.log("кликнули на кнопку удалить")
+// ─── Delete ───────────────────────────────────────────────────────────────────
 
+function openDeleteModal(id) {
+    deletePrompt.querySelector('#deletePromptLabel').textContent = 'Book deletion #' + id
+
+    // Clone button to remove old listeners
+    const btnDelete = deletePrompt.querySelector('#btn-delete')
+    const freshBtn = btnDelete.cloneNode(true)
+    btnDelete.replaceWith(freshBtn)
+
+    freshBtn.addEventListener('click', () => {
         fetch('http://localhost:3000/books/delete', {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: event.currentTarget.dataset.id
-            }) // data-id // data-firstname // data-first-lastname
-        }).then(response => {
-            return response.json()
-        }).then(data => {
-            //TODO - удалить книгу из списка на странице
-            console.log(data)
-            getBooks()
-            _deleteConfirmed.hide()
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
         })
-    })
-}
-
-
-function forBtnEdit(event) {
-
-    console.log(event.currentTarget.dataset.id)
-    const idFromEventTarget = event.currentTarget.dataset.id;
-    console.log("кликнули на кнопку редактировать")
-    
-    const modalTitle = modal.querySelector('#exampleModalLabel')
-    modalTitle.innerText = 'Modifying book #' + event.currentTarget.dataset.id
-
-    // как корзина и по лесу. сперва заполняешь всем чем нужно, уже после этого уже вывыдишь, показываешь и т.д
-    modal.addEventListener('show.bs.modal', event => {
-        // step 1 get form 
-        getForm()
-
-        const title = modal.querySelector('#exampleFormControlInput1')
-        const author = modal.querySelector('#exampleFormControlInput2')
-        console.log(title, author);
-
-        // step 2 fill the form with data from server
-        fetch('http://localhost:3000/books/' + idFromEventTarget, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            }) //если бомбим GET, то body не нужен. мы только принимаем, мы не ничего через body не отправляем.
-            .then(response => response.json())
-            .then(data => {
-
-                console.log(data);
-
-                
-                title.value = data.bookFromResponse.title
-                author.value = data.bookFromResponse.author
-            })
+        .then(r => r.json())
+        .then(() => { getBooks(); bsDeleteModal.hide() })
     })
 
-    const _editModal = new bootstrap.Modal(modal)
-    _editModal.show()
-
-
-
-    modalDeletePrompt.querySelector('#btn-delete').addEventListener('click', (event) => {
-        console.log(event.currentTarget.dataset.id)
-    })
+    bsDeleteModal.show()
 }
 
-function fieldToTakeValue() {
-    exampleFormControlInput1.addEventListener()
-}
+// ─── Init ─────────────────────────────────────────────────────────────────────
+
+getBooks()
