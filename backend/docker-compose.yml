@@ -1,0 +1,33 @@
+services:
+  # Database Service
+  db:
+    image: lscr.io/linuxserver/mariadb:latest
+    container_name: mariadb
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - MYSQL_PASSWORD=12345
+      - MYSQL_DATABASE=omis
+      - MYSQL_USER=root
+    volumes:
+      - ./mysql_data:/config
+    restart: unless-stopped
+
+  # phpMyAdmin Service
+  phpmyadmin:
+    image: lscr.io/linuxserver/phpmyadmin:latest
+    container_name: phpmyadmin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - PMA_HOST=db                                # <--- Matches the service name above
+      - PMA_PORT=3306
+    volumes:
+      - ./pma_config:/config
+    ports:
+      - 8081:80                                    # Access via http://localhost:8081
+    restart: unless-stopped
+    depends_on:
+      - db
